@@ -1,0 +1,471 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen KLOZ</title>
+        <style>
+        body {
+            background: linear-gradient(to left, #b8b8b8, #dcdcdc);
+            color: #000;
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        #container {
+            width: 100%;
+            max-width: 650px;
+            padding: 40px;
+            background: rgba(255,255,255,0.5);
+            border: 1px solid #000;
+            box-shadow: 0 0 20px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        h1 {
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            font-size: 1.8rem;
+            color: #000;
+        }
+
+        .question-block {
+            margin-bottom: 25px;
+            display: none;
+        }
+        .question-block.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            color: #000;
+        }
+
+        .option {
+            display: block;
+            padding: 15px 20px;
+            margin-bottom: 12px;
+            border: 1px solid #000;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #fff;
+            font-size: 1.05rem;
+            color: #000;
+        }
+
+        .option:hover {
+            background-color: rgba(0,0,0,0.1);
+        }
+
+        .option.selected {
+            background-color: #000;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: #000;
+            border: 1px solid #000;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+        }
+
+        .btn:hover:not(:disabled) {
+            background-color: #fff;
+            color: #000;
+            box-shadow: 0 0 20px rgba(0,0,0,0.3);
+        }
+        
+        .btn:disabled {
+            border-color: #999;
+            color: #999;
+            cursor: not-allowed;
+            background: #ccc;
+            box-shadow: none;
+        }
+
+        #timer-screen, #success-screen, #start-screen {
+            display: none;
+            text-align: center;
+        }
+
+        .big-timer {
+            font-size: 3.5rem;
+            margin: 30px 0;
+            font-family: monospace;
+            text-shadow: 0 0 15px #000;
+            color: #000;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .confetti {
+            position: fixed;
+            z-index: 100;
+            opacity: 0;
+        }
+        
+        @keyframes floatDown {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #ccc;
+            margin-bottom: 30px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #000;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        #btn-volver {
+            position: fixed;
+            bottom: 40px;
+            right: 40px;
+            padding: 12px 30px;
+            font-size: 0.75rem;
+            min-width: auto;
+            border: 1px solid #000;
+            background: #000;
+            color: #fff;
+            text-transform: uppercase;
+            cursor: pointer;
+            z-index: 50;
+        }
+        #btn-volver:hover {
+            background-color: #fff;
+            color: #000;
+        }
+        </style>
+</head>
+<body>
+
+    <button id="btn-volver" onclick="window.location.href='index.html'">Volver a la Bóveda</button>
+
+    <div id="container">
+        <!-- Start Screen -->
+        <div id="start-screen">
+            <h1>Evaluación de Closer</h1>
+            <p style="margin-bottom:30px; font-size:1.1rem; line-height:1.5;">Deberás responder correctamente todas las preguntas para obtener tu habilitación. Si fallas una sola pregunta, serás bloqueado por 30 minutos.</p>
+            <button class="btn" onclick="startExam()">Comenzar Examen</button>
+        </div>
+
+        <!-- Timer Screen -->
+        <div id="timer-screen">
+            <h1>Acceso Denegado</h1>
+            <p>Has fallado en demostrar tus habilidades.</p>
+            <p>Debes esperar para volver a intentarlo.</p>
+            <div class="big-timer" id="countdown">30:00</div>
+        </div>
+
+        <!-- Success Screen -->
+        <div id="success-screen">
+            <h1 id="success-title" style="font-size: 2.2rem; color: #000;">¡Habilitación Concedida!</h1>
+            <p id="success-text" style="font-size: 1.2rem; margin-top:20px; color:#000;">Tienes el instinto de un verdadero Closer.</p>
+            <button class="btn" id="btn-registrarse" style="display:none; font-size:1.1rem; background:#000; color:#fff; border-color:#000;" onclick="irARegistro()">REGISTRARME EN KLOZ</button>
+        </div>
+
+        <!-- Exam Screen -->
+        <div id="exam-screen" style="display: none;">
+            <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+            <h1 id="q-number" style="font-size:1.4rem;">Pregunta 1/5</h1>
+            <div id="question-timer" style="font-size:2.5rem; font-weight:bold; text-align:center; font-family:monospace; margin:15px 0; padding:10px; border:2px solid #000;">⏱ 20</div>
+            
+            <div id="questions-container">
+                <!-- Dynamically injected -->
+            </div>
+            
+            <button class="btn" id="btn-next" onclick="nextQuestion()" disabled>Siguiente</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                q: "Un prospecto al final de la llamada te dice: 'Me encanta, pero tengo que pensarlo'. ¿Cuál es la mejor respuesta inicial de un closer de alto nivel?",
+                options: [
+                    "A) Entiendo perfectamente. ¿Te parece si agendamos una llamada la próxima semana para ver qué decidiste?",
+                    "B) Totalmente comprensible. Solo por curiosidad, para que no me quede dando vueltas, ¿qué es exactamente lo que necesitas pensar?",
+                    "C) Si lo piensas mucho podrías perder esta oportunidad única. ¿Estás seguro de que no quieres aprovechar la oferta hoy?"
+                ],
+                correct: 1 // B
+            },
+            {
+                q: "Durante la etapa de calificación, descubres que el prospecto NO tiene un dolor real ni urgente. Saca la billetera por compulsión. ¿Qué debes hacer?",
+                options: [
+                    "A) Cobrar rápidamente la venta, un cierre es un cierre.",
+                    "B) Bajar el precio para asegurarte de que no se arrepienta mañana.",
+                    "C) Frenar la venta y escarbar mediante preguntas incómodas para hacerle notar el problema real o descalificarlo."
+                ],
+                correct: 2 // C
+            },
+            {
+                q: "¿Qué significa realmente aislar una objeción?",
+                options: [
+                    "A) Asegurarte con una pregunta cerrada de que ese problema (ej. dinero o socios) sea la ÚNICA barrera real entre la venta y el no.",
+                    "B) Ignorar sutilmente lo que dijo el prospecto y volver a explicar los beneficios del servicio.",
+                    "C) Cambiar de tema rápidamente para evitar que el prospecto se mantenga enfocado en lo negativo y se enfríe."
+                ],
+                correct: 0 // A
+            },
+            {
+                q: "El prospecto te detiene a los 10 minutos de llamada y te exige: 'Ve al punto, ¿cuánto cuesta esto?'. Tu respuesta ideal es:",
+                options: [
+                    "A) Dar el precio directo y preguntar si está dentro de su presupuesto.",
+                    "B) 'Te daré el precio, pero primero quiero saber más de tu negocio para ver si realmente puedo ayudarte.'",
+                    "C) 'Es muy caro pero vale la pena, primero déjame explicarte por qué.'"
+                ],
+                correct: 1 // B
+            },
+            {
+                q: "¿Cuál es el momento perfecto para revelar y anclar el precio de tu oferta?",
+                options: [
+                    "A) Al principio de la llamada para filtrar de inmediato a los curiosos sin dinero.",
+                    "B) Después de establecer claramente el dolor, mostrarle que tu solución es el puente exacto, y obtener confirmación de que eso es lo que asume necesitar.",
+                    "C) Inmediatamente después de compartir pantalla mostrando testimonios en video."
+                ],
+                correct: 1 // B
+            }
+        ];
+
+        let currentQuestion = 0;
+        let selectedAnswers = [];
+        let blockTimeKey = 'kloz_exam_blocked_until';
+        let countdownInterval;
+        let questionTimerInterval;
+
+        function startQuestionTimer() {
+            clearInterval(questionTimerInterval);
+            let timeLeft = 20;
+            const timerEl = document.getElementById('question-timer');
+            timerEl.style.color = '#000';
+            timerEl.style.borderColor = '#000';
+            timerEl.innerText = '⏱ 20';
+
+            questionTimerInterval = setInterval(() => {
+                timeLeft--;
+                timerEl.innerText = '⏱ ' + timeLeft;
+                if (timeLeft <= 5) {
+                    timerEl.style.color = '#cc0000';
+                    timerEl.style.borderColor = '#cc0000';
+                }
+                if (timeLeft <= 0) {
+                    clearInterval(questionTimerInterval);
+                    const blockUntil = Date.now() + (30 * 60 * 1000);
+                    localStorage.setItem(blockTimeKey, blockUntil);
+                    checkBlockStatus();
+                }
+            }, 1000);
+        }
+
+        function checkBlockStatus() {
+            const blockedUntil = localStorage.getItem(blockTimeKey);
+            if (blockedUntil) {
+                const timeRemaining = parseInt(blockedUntil) - Date.now();
+                if (timeRemaining > 0) {
+                    showScreen('timer-screen');
+                    startTimer(timeRemaining);
+                    return true;
+                } else {
+                    localStorage.removeItem(blockTimeKey);
+                }
+            }
+            showScreen('start-screen');
+            return false;
+        }
+
+        function showScreen(screenId) {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('timer-screen').style.display = 'none';
+            document.getElementById('success-screen').style.display = 'none';
+            document.getElementById('exam-screen').style.display = 'none';
+            document.getElementById(screenId).style.display = 'block';
+        }
+
+        function startTimer(ms) {
+            clearInterval(countdownInterval);
+            const timerDisplay = document.getElementById('countdown');
+            
+            countdownInterval = setInterval(() => {
+                const now = Date.now();
+                const diff = parseInt(localStorage.getItem(blockTimeKey)) - now;
+                
+                if (diff <= 0) {
+                    clearInterval(countdownInterval);
+                    localStorage.removeItem(blockTimeKey);
+                    showScreen('start-screen');
+                    timerDisplay.innerText = "00:00";
+                    return;
+                }
+
+                const totalSeconds = Math.floor(diff / 1000);
+                const minutes = Math.floor(totalSeconds / 60);
+                const seconds = totalSeconds % 60;
+                timerDisplay.innerText = \`\${minutes.toString().padStart(2, '0')}:\${seconds.toString().padStart(2, '0')}\`;
+            }, 1000);
+        }
+
+        function startExam() {
+            currentQuestion = 0;
+            selectedAnswers = [];
+            showScreen('exam-screen');
+            renderQuestion(currentQuestion);
+        }
+
+        function renderQuestion(index) {
+            const container = document.getElementById('questions-container');
+            container.innerHTML = '';
+            
+            const qData = questions[index];
+            document.getElementById('q-number').innerText = \`Pregunta \${index + 1}/\${questions.length}\`;
+            document.getElementById('progress').style.width = \`\${((index) / questions.length) * 100}%\`;
+
+            const block = document.createElement('div');
+            block.className = 'question-block active';
+            
+            const p = document.createElement('div');
+            p.className = 'question-text';
+            p.innerText = qData.q;
+            block.appendChild(p);
+
+            qData.options.forEach((optStr, optIdx) => {
+                const optDiv = document.createElement('div');
+                optDiv.className = 'option';
+                optDiv.innerText = optStr;
+                optDiv.onclick = () => selectOption(optIdx, index);
+                block.appendChild(optDiv);
+            });
+
+            container.appendChild(block);
+            document.getElementById('btn-next').disabled = true;
+            startQuestionTimer();
+            
+            if (index === questions.length - 1) {
+                document.getElementById('btn-next').innerText = 'Finalizar Examen';
+            } else {
+                document.getElementById('btn-next').innerText = 'Siguiente';
+            }
+        }
+
+        function selectOption(optIdx, qIdx) {
+            clearInterval(questionTimerInterval);
+            const options = document.querySelectorAll('.option');
+            options.forEach(o => o.classList.remove('selected'));
+            options[optIdx].classList.add('selected');
+            selectedAnswers[qIdx] = optIdx;
+            document.getElementById('btn-next').disabled = false;
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                renderQuestion(currentQuestion);
+            } else {
+                evaluateExam();
+            }
+        }
+
+        function evaluateExam() {
+            // Actualizar barra de progreso al final
+            document.getElementById('progress').style.width = '100%';
+
+            let correctCount = 0;
+            for (let i = 0; i < questions.length; i++) {
+                if (selectedAnswers[i] === questions[i].correct) {
+                    correctCount++;
+                }
+            }
+
+            if (correctCount === questions.length) {
+                showSuccess();
+            } else {
+                const blockUntil = Date.now() + (30 * 60 * 1000); 
+                localStorage.setItem(blockTimeKey, blockUntil);
+                checkBlockStatus();
+            }
+        }
+
+        function showSuccess() {
+            localStorage.setItem('k_examen_ok', '1');
+            showScreen('success-screen');
+            launchConfetti();
+            
+            setTimeout(() => {
+                document.getElementById('success-title').style.display = 'none';
+                document.getElementById('success-text').style.display = 'none';
+                document.getElementById('btn-registrarse').style.display = 'block';
+            }, 6000);
+        }
+
+        function irARegistro() {
+            window.location.href = 'index.html';
+        }
+
+        function launchConfetti() {
+            const container = document.body;
+            for (let i = 0; i < 80; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = (Math.random() * 100) + 'vw';
+                
+                // Random fall speed between 3s and 6s
+                const fallTime = Math.random() * 3 + 3;
+                confetti.style.animation = \`floatDown \${fallTime}s linear forwards\`;
+                // Random start delay
+                confetti.style.animationDelay = (Math.random() * 2) + 's';
+                
+                const colors = ['#d4af37', '#ffffff', '#fff3cd', '#888888'];
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                if (Math.random() > 0.4) {
+                    // Balloon style
+                    confetti.style.borderRadius = '50%';
+                    confetti.style.width = '15px';
+                    confetti.style.height = '20px';
+                } else {
+                    // Confetti style
+                    confetti.style.width = '10px';
+                    confetti.style.height = '10px';
+                    confetti.style.transform = \`rotate(\${Math.random() * 360}deg)\`;
+                }
+                
+                container.appendChild(confetti);
+                
+                // Limpieza del elemento para no llenar el DOM
+                setTimeout(() => {
+                    if(document.body.contains(confetti)) {
+                        confetti.remove();
+                    }
+                }, (fallTime + 2) * 1000); 
+            }
+        }
+
+        window.onload = checkBlockStatus;
+    </script>
+</body>
+</html>

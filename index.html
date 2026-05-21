@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KLOZ - La Boveda de los Closers</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <!-- ZONA PROTEGIDA: estilos de la boveda -->
+    <link rel="stylesheet" href="vault.css">
+
+    <!-- ZONA MODIFICABLE: estilos del dashboard / app -->
+    <link rel="stylesheet" href="app.css">
+
+    <!-- ZONA MODIFICABLE: estilos de empresa -->
+    <link rel="stylesheet" href="empresa.css">
+</head>
+<body class="theme-diamond">
+
+    <!-- Audios de la boveda -->
+    <audio id="audio-engranaje" src="engranaje.mp3"></audio>
+    <audio id="audio-woosh"     src="woosh.mp3"></audio>
+    <audio id="audio-clank"     src="clank.mp3"></audio>
+
+    <!-- ======= ZONA PROTEGIDA: HTML DE LA BOVEDA ======= -->
+    <div id="contenedor-boveda">
+        <div class="dial"></div>
+        <div class="logo" onclick="iniciarApertura()"></div>
+    </div>
+
+    <div id="btn-nav-left"  class="nav-arrow arrow-left">&#10094;</div>
+    <div id="btn-nav-right" class="nav-arrow arrow-right">&#10095;</div>
+
+    <div id="selector-rol">
+        <div class="pantalla-rol" style="background: linear-gradient(to right, #000, #050505);">
+            <div style="font-size:0.9rem; letter-spacing:5px; margin-bottom:25px; opacity:0.5;">SECCION CORPORATIVA</div>
+            <button class="btn-rol" onclick="elegirRol('empresa')">Empresa</button>
+        </div>
+        <div class="pantalla-rol" style="background: linear-gradient(to left, #000, #080808);">
+            <div style="font-size:0.9rem; letter-spacing:5px; margin-bottom:25px; opacity:0.5;">SECCION PROFESIONAL</div>
+            <button class="btn-rol" onclick="elegirRol('closer')">Closer</button>
+        </div>
+        <div class="pantalla-rol" style="background:#000;">
+            <div style="font-size:0.9rem; letter-spacing:6px; margin-bottom:25px; opacity:0.6;">CERRAR SESION</div>
+            <div class="logo" style="position:relative; opacity:1; transform:scale(0.65);" onclick="iniciarCierre()"></div>
+            <p style="color:var(--accent-color); font-weight:800; margin-top:30px; letter-spacing:2px;">PULSA EL LOGO PARA CERRAR</p>
+        </div>
+    </div>
+    <!-- ======= FIN ZONA PROTEGIDA: HTML DE LA BOVEDA ======= -->
+
+    <!-- ======= ZONA MODIFICABLE: DASHBOARD DEL CLOSER ======= -->
+    <div id="dashboard-closer">
+        <header class="top-bar">
+            <div class="kloz-brand" onclick="volverAlSelector()">KLOZ</div>
+            <div class="icon-group">
+                <div class="icon-btn" onclick="alert('Soporte')">&#10067;</div>
+                <div class="icon-btn" style="position:relative;" onclick="toggleMensajes()">
+                    &#128172;
+                    <div class="msg-badge" id="badge-msg">3</div>
+                </div>
+                <div class="icon-btn" style="position:relative;" onclick="toggleNotificaciones()">
+                    &#128276;
+                    <div class="notif-badge" id="badge-notif">1</div>
+                </div>
+                <div class="icon-btn" onclick="toggleDropdown()">&#128100;</div>
+            </div>
+            <div id="dropdown-perfil">
+                <div class="drop-item" onclick="abrirPerfil()">&#128100; Mi Perfil</div>
+                <div class="drop-item" onclick="abrirPortafolio()">&#128188; Mi Portafolio</div>
+                <div class="drop-item" onclick="alert('Pagos')">&#128179; Mis Pagos</div>
+                <div style="border-top:1px solid #222; margin:8px 0;"></div>
+                <div class="drop-item" onclick="iniciarCierre()">&#128682; Salir</div>
+            </div>
+            <div id="dropdown-mensajes">
+                <div class="notif-header" style="background:#2980b9;">BANDEJA DE ENTRADA</div>
+                <div class="notif-item unread" onclick="marcarMensajesLeidos(); abrirChat()">
+                    <div class="notif-icon" style="background:#000;">&#129302;</div>
+                    <div class="notif-text">
+                        <strong>Simulador KLOZ</strong><br>
+                        Entrenamiento de Objeciones...
+                        <div class="notif-time">Sistema activo</div>
+                    </div>
+                </div>
+                <div class="notif-item unread" onclick="marcarMensajesLeidos(); alert('Chat con empresa: Inmobiliaria Horizonte')">
+                    <div class="notif-icon" style="background:#8e44ad;">&#128188;</div>
+                    <div class="notif-text">
+                        <strong>Inmobiliaria Horizonte</strong><br>
+                        "Hola, vimos tu CV de Closer..."
+                        <div class="notif-time">Hace 5 min</div>
+                    </div>
+                </div>
+                <div class="notif-item unread" onclick="marcarMensajesLeidos(); alert('Comunidad Global de Closers')">
+                    <div class="notif-icon" style="background:#27ae60;">&#127758;</div>
+                    <div class="notif-text">
+                        <strong>Comunidad Elite</strong><br>
+                        Nuevas estrategias en el foro.
+                        <div class="notif-time">Hace 2 horas</div>
+                    </div>
+                </div>
+                <div class="notif-footer" onclick="marcarMensajesLeidos()">Ver todos los mensajes</div>
+            </div>
+            
+            <div id="dropdown-notificaciones">
+                <div class="notif-header">NOTIFICACIONES</div>
+                <div class="notif-item unread" onclick="abrirNotifEmpresa()">
+                    <div class="notif-icon" style="background:#000;">&#128188;</div>
+                    <div class="notif-text">
+                        <strong>Inmobiliaria Horizonte</strong> requirió tu perfil y agendó llamada.
+                        <div class="notif-time">Hace 10 min</div>
+                    </div>
+                </div>
+                <div class="notif-item unread" onclick="abrirNotifChat()">
+                    <div class="notif-icon" style="background:#e74c3c;">&#128172;</div>
+                    <div class="notif-text">
+                        <strong>Grupo Elite (Chat)</strong>: "Muchachos, vean el nuevo caso de estudio que subieron al drive."
+                        <div class="notif-time">Hace 1 hora</div>
+                    </div>
+                </div>
+                <div class="notif-footer" onclick="marcarNotificacionesLeidas()">Marcar todo como leido</div>
+            </div>
+        </header>
+        <main class="spa-view" id="spa-main-content">
+        </main>
+    </div>
+    <!-- ======= FIN ZONA MODIFICABLE: DASHBOARD ======= -->
+
+    <!-- ======= ZONA MODIFICABLE: DASHBOARD DE EMPRESA ======= -->
+    <div id="dashboard-empresa">
+        <header class="top-bar-empresa">
+            <div class="empresa-brand" onclick="cerrarDashboardEmpresa()">KLOZ</div>
+            <nav class="empresa-nav">
+                <button class="empresa-nav-btn activo" onclick="mostrarVistaEmpresas()">CATALOGO</button>
+                <button class="empresa-nav-btn" onclick="alert('Mis cierres')">MIS CIERRES</button>
+                <button class="empresa-nav-btn" onclick="alert('Pagos')">PAGOS</button>
+                <button class="empresa-nav-btn" id="btn-registrar-empresa" onclick="mostrarMiEmpresa()">REGISTRAR MI EMPRESA</button>
+            </nav>
+        </header>
+        <main class="spa-empresa" id="spa-empresa-content"></main>
+    </div>
+    <!-- ======= FIN ZONA MODIFICABLE: DASHBOARD EMPRESA ======= -->
+
+    <!-- ZONA PROTEGIDA: logica de la boveda -->
+    <script src="vault.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- ZONA MODIFICABLE: datos ficticios -->
+    <script src="demo-data.js"></script>
+
+    <!-- ZONA MODIFICABLE: logica del dashboard / app -->
+    <script src="app.js"></script>
+
+    <!-- ZONA MODIFICABLE: logica de empresa -->
+    <script src="empresa.js"></script>
+
+    
+</body>
+</html>
+
+
+
+
