@@ -1,0 +1,98 @@
+/* =====================================================
+   KLOZ - VAULT.CSS
+   ZONA PROTEGIDA: ESTILOS DE LA BOVEDA
+   No modificar sin autorizacion explicita.
+   ===================================================== */
+
+:root {
+    --main-gold: #d4af37;
+    --main-bronze: #cd7f32;
+    --main-silver: #c0c0c0;
+    --main-diamond: #e0ffff;
+    --accent-color: var(--main-diamond);
+    --bg-dark: #000;
+}
+.theme-bronze { --accent-color: var(--main-bronze); }
+.theme-silver { --accent-color: var(--main-silver); }
+.theme-gold   { --accent-color: var(--main-gold); }
+.theme-diamond{ --accent-color: var(--main-diamond); }
+
+::-webkit-scrollbar { display: none; }
+* { -ms-overflow-style: none; scrollbar-width: none; box-sizing: border-box; }
+
+body {
+    background-color: var(--bg-dark);
+    margin: 0; height: 100vh;
+    display: flex; justify-content: center; align-items: center;
+    overflow: hidden; font-family: 'Inter', sans-serif;
+    color: var(--accent-color); caret-color: transparent;
+}
+
+#contenedor-boveda {
+    position: relative; width: 500px; height: 500px;
+    display: flex; justify-content: center; align-items: center;
+    transition: transform 1.2s cubic-bezier(0.7, 0, 0.3, 1), opacity 0.8s;
+    z-index: 200;
+}
+
+.dial {
+    position: absolute; width: 100%; height: 100%;
+    background: url('dial.png') no-repeat center; background-size: contain;
+    transition: transform 2.8s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+    opacity: 0; animation: aparecer 1.5s forwards;
+    z-index: 10;
+}
+
+.logo {
+    position: absolute; width: 78%; height: 78%;
+    background: url('klozz.png') no-repeat center; background-size: contain;
+    cursor: pointer; z-index: 20;
+    opacity: 0; animation: aparecer 1.5s forwards;
+    filter: drop-shadow(0 0 15px var(--accent-color));
+    pointer-events: auto !important;
+}
+
+@keyframes aparecer { from { opacity: 0; } to { opacity: 1; } }
+
+.girando .dial { transform: rotate(360deg); }
+.girando-cierre .dial { transform: rotate(-360deg); }
+.zoom-salida { transform: scale(15); opacity: 0; pointer-events: none; }
+
+#selector-rol {
+    position: fixed; top: 0; left: 0; width: 300%; height: 100%;
+    display: none; transition: transform 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+    z-index: 50;
+}
+.pantalla-rol {
+    width: 33.333%; height: 100%; float: left;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    text-align: center; padding: 40px; border-right: 1px solid rgba(255,255,255,0.05);
+}
+.pantalla-rol[style*="width: 100%"] {
+    width: 100% !important;
+    float: none;
+}
+.btn-rol {
+    padding: 40px; border: 2px solid var(--accent-color); background: rgba(255,255,255,0.02);
+    color: var(--accent-color); font-size: 2.2rem; font-weight: 800; cursor: pointer;
+    transition: 0.4s; width: 380px; text-transform: uppercase; letter-spacing: 2px;
+}
+.btn-rol:hover { background: var(--accent-color); color: #000; box-shadow: 0 0 30px var(--accent-color); }
+
+.nav-arrow {
+    position: fixed; top: 50%; transform: translateY(-50%);
+    width: 80px; height: 80px; background: rgba(0,0,0,0.6);
+    border: 2px solid var(--accent-color); color: var(--accent-color);
+    display: none; align-items: center; justify-content: center;
+    font-size: 2.5rem; cursor: pointer; z-index: 101; transition: 0.3s;
+    border-radius: 50%;
+}
+.nav-arrow:hover { background: var(--accent-color); color: #000; box-shadow: 0 0 25px var(--accent-color); }
+.arrow-left  { left: 40px; }
+.arrow-right { right: 40px; }
+
+@keyframes pulseArrow {
+    0%, 100% { transform: translateY(-50%) translateX(0); }
+    50%       { transform: translateY(-50%) translateX(8px); }
+}
+.arrow-right { animation: pulseArrow 1.5s infinite; }
